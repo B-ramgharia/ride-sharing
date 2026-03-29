@@ -421,13 +421,16 @@
             
             const btn = event ? event.target || event.srcElement : null;
             let originalText = "Request Pulse Ride";
-            if(btn && btn.tagName === 'BUTTON') {
-                originalText = btn.innerText;
-                btn.innerText = "Routing..."; btn.disabled = true;
+            let realBtn = null;
+            if(btn && btn.closest('button')) {
+                realBtn = btn.closest('button');
+                originalText = realBtn.innerText;
+                realBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">refresh</span> ROUTING...`;
+                realBtn.disabled = true;
             }
 
             try {
-                const dropRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropValue)}&format=json&limit=1`);
+                const dropRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropValue)}&format=json&limit=1`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
                 const dropData = await dropRes.json();
                 if(dropData && dropData.length > 0) {
                     const dropLat = parseFloat(dropData[0].lat); const dropLon = parseFloat(dropData[0].lon);
@@ -443,14 +446,14 @@
                         
                         if(window.currentRoute) window.mapInstance.removeLayer(window.currentRoute);
                         window.currentRoute = L.geoJSON(route.geometry, {
-                            style: { color: '#3fff8b', weight: 4, opacity: 0.9, dashArray: '10, 10' }
+                            style: { color: '#3fff8b', weight: 5, opacity: 0.9, dashArray: '10, 15', lineCap: 'round' }
                         }).addTo(window.mapInstance);
                         
-                        window.mapInstance.fitBounds(window.currentRoute.getBounds(), { padding: [60, 60] });
+                        window.mapInstance.fitBounds(window.currentRoute.getBounds(), { padding: [80, 80] });
 
                         if(window.dropMarker) window.mapInstance.removeLayer(window.dropMarker);
                         window.dropMarker = L.marker([dropLat, dropLon], {
-                            icon: L.divIcon({ html: `<span class="material-symbols-outlined text-red-500 drop-shadow-lg" style="font-variation-settings: 'FILL' 1; font-size: 32px; transform:translate(-8px,-24px)">location_on</span>`})
+                            icon: L.divIcon({ html: `<span class="material-symbols-outlined text-emerald-400 drop-shadow-[0_0_15px_rgba(63,255,139,0.8)]" style="font-variation-settings: 'FILL' 1; font-size: 32px; transform:translate(-8px,-24px)">location_on</span>`})
                         }).addTo(window.mapInstance);
                         
                         const basePrice = Math.max(50, Math.floor(50 + (16 * distanceKm)));
@@ -463,13 +466,19 @@
                         document.getElementById('dist-sedan').innerText = distanceKm + ' km';
 
                         simulateNearestVehicles(pLat, pLon);
+                        
+                        // Radar Animation Delay
+                        if(realBtn) {
+                            realBtn.innerHTML = `<span class="material-symbols-outlined animate-ping text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">radar</span> FINDING NEARBY DRIVERS...`;
+                        }
+                        await new Promise(r => setTimeout(r, 2500));
                     }
                 } else {
                     console.log("No valid drop location found, reverting to fallback animation.");
                 }
             } catch(e) { console.error("Routing error:", e); }
             
-            if(btn && btn.tagName === 'BUTTON') { btn.innerText = originalText; btn.disabled = false; }
+            if(realBtn) { realBtn.innerText = originalText; realBtn.disabled = false; }
             originalFindRides();
         };
 
