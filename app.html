@@ -514,7 +514,12 @@
             list.classList.remove('hidden');
             
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1&accept-language=en`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
+                let boundsQuery = '';
+                if(window.mapInstance) {
+                    const b = window.mapInstance.getBounds();
+                    boundsQuery = `&viewbox=${b.getWest()},${b.getNorth()},${b.getEast()},${b.getSouth()}`;
+                }
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1&accept-language=en${boundsQuery}`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
                 const data = await res.json();
                 list.innerHTML = '';
                 
