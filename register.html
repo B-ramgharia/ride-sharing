@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinetic - Premium Ride Sharing Login</title>
+    <title>Kinetic - Premium Ride Sharing Register</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -56,11 +56,21 @@
                 <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[80px]"></div>
                 
                 <div class="text-center mb-10 relative z-10">
-                    <h2 class="text-4xl font-black text-white mb-2 tracking-tight font-headline">Login to <span class="heading-gradient">Kinetic.</span></h2>
-                    <p class="text-neutral-400">Welcome back! Access your rides.</p>
+                    <h2 class="text-4xl font-black text-white mb-2 tracking-tight font-headline">Join <span class="heading-gradient">Kinetic.</span></h2>
+                    <p class="text-neutral-400">Create an account to ride securely.</p>
                 </div>
 
                 <form method="GET" action="app.html" class="space-y-6 relative z-10">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-neutral-400">Full Name</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500"></i>
+                            <input type="text" name="name" required
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:border-primary outline-none transition-all text-white placeholder-neutral-600"
+                                placeholder="John Doe">
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium mb-2 text-neutral-400">Email Address</label>
                         <div class="relative">
@@ -83,14 +93,14 @@
 
                     <button type="submit" 
                         class="w-full py-4 bg-primary hover:bg-primary-container text-black rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(63,255,139,0.3)] transition-all active:scale-95 flex items-center justify-center space-x-2">
-                        <span>Sign In</span>
+                        <span>Sign Up</span>
                         <i data-lucide="chevron-right" class="w-5 h-5"></i>
                     </button>
                 </form>
 
                 <div class="mt-8 text-center relative z-10">
                     <p class="text-neutral-500 text-sm">
-                        Don't have an account? <a href="register.html" class="text-primary font-bold hover:underline italic">Register now</a>
+                        Already have an account? <a href="login.html" class="text-primary font-bold hover:underline italic">Sign in now</a>
                     </p>
                 </div>
             </div>
