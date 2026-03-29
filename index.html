@@ -1,136 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ride Sharing Premium App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="style.css">
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#74fbbb",
+              "inverse-on-surface": "#565555",
+              "tertiary-fixed-dim": "#00cdec",
+              "on-secondary": "#005e3d",
+              "inverse-surface": "#fcf9f8",
+              "tertiary": "#7ae6ff",
+              "surface-container-high": "#20201f",
+              "on-background": "#ffffff",
+              "surface-dim": "#0e0e0e",
+              "tertiary-container": "#00dcfd",
+              "on-surface-variant": "#adaaaa",
+              "primary-dim": "#24f07e",
+              "surface-container-highest": "#262626",
+              "secondary": "#74fbbb",
+              "on-primary-container": "#004f24",
+              "on-secondary-fixed-variant": "#006945",
+              "on-tertiary-fixed": "#00343d",
+              "outline": "#767575",
+              "primary-fixed": "#3fff8b",
+              "primary-container": "#13ea79",
+              "surface-variant": "#262626",
+              "on-surface": "#ffffff",
+              "surface-container": "#1a1a1a",
+              "surface-container-low": "#131313",
+              "on-primary-fixed-variant": "#006832",
+              "background": "#0e0e0e",
+              "tertiary-fixed": "#00dcfd",
+              "surface-tint": "#3fff8b",
+              "surface-container-lowest": "#000000",
+              "secondary-container": "#006c47",
+              "on-error": "#490006",
+              "error-container": "#9f0519",
+              "primary": "#3fff8b",
+              "secondary-dim": "#65ecae",
+              "on-primary": "#005d2c",
+              "error-dim": "#d7383b",
+              "on-tertiary-container": "#004955",
+              "on-tertiary": "#005360",
+              "surface-bright": "#2c2c2c",
+              "tertiary-dim": "#00cdec",
+              "inverse-primary": "#006e35",
+              "secondary-fixed-dim": "#65ecae",
+              "surface": "#0e0e0e",
+              "error": "#ff716c",
+              "outline-variant": "#484847",
+              "primary-fixed-dim": "#24f07e",
+              "on-tertiary-fixed-variant": "#005361",
+              "on-secondary-fixed": "#00492f",
+              "on-error-container": "#ffa8a3",
+              "on-secondary-container": "#e1ffeb",
+              "on-primary-fixed": "#004820"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0e0e0e; color: #ffffff; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .map-gradient-overlay {
+            background: linear-gradient(to right, rgba(14, 14, 14, 1) 0%, rgba(14, 14, 14, 0.8) 30%, rgba(14, 14, 14, 0) 100%);
+        }
+        .kinetic-glass {
+            background: rgba(38, 38, 38, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
 </head>
-<body>
-    <div id="app">
-        <header>
-            <h2>Ride Sharing</h2>
-            <div class="logo-circle" id="header-logo">
-                <img src="./assets/images/logo.png" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerText='RS';">
-            </div>
-        </header>
-
-        <section id="login-screen" class="screen active">
-            <h3>Customer Login</h3>
-            <input id="login-email" type="email" placeholder="Email Address">
-            <input id="login-password" type="password" placeholder="Password">
-            <button class="primary-btn" onclick="login()">Login to Account</button>
-            <button class="secondary-btn" onclick="switchToDriver()">Switch to Driver Mode</button>
-        </section>
-
-        <section id="location-screen" class="screen">
-            <h3>Book a Ride</h3>
-            <div class="input-group">
-                <input id="pickup" type="text" placeholder="Enter Pickup Location">
-                <input id="drop" type="text" placeholder="Enter Drop Location">
-            </div>
-            <div id="map" class="map-container"></div>
-            <button class="primary-btn" onclick="findRides()">Next: Select Ride Type</button>
-        </section>
-
-        <section id="ride-type-screen" class="screen">
-            <h3>Select Ride</h3>
-            <div class="ride-type">
-                <label>
-                    <input type="radio" name="rideType" value="Bike" checked>
-                    <div class="ride-card">
-                        <span class="ride-name">Bike</span>
-                        <span class="ride-price">₹40</span>
-                    </div>
-                </label>
-                <label>
-                    <input type="radio" name="rideType" value="Mini">
-                    <div class="ride-card">
-                        <span class="ride-name">Mini</span>
-                        <span class="ride-price">₹60</span>
-                    </div>
-                </label>
-                <label>
-                    <input type="radio" name="rideType" value="Sedan">
-                    <div class="ride-card">
-                        <span class="ride-name">Sedan</span>
-                        <span class="ride-price">₹80</span>
-                    </div>
-                </label>
-            </div>
-            <button class="primary-btn" onclick="confirmBooking()">Confirm Booking</button>
-        </section>
-
-        <section id="track-driver-screen" class="screen">
-            <h3>Driver is Arriving...</h3>
-            <div id="driver-map" class="map-container"></div>
-            <div class="driver-info">
-                <div class="driver-photo"></div>
-                <div class="driver-details">
-                    <b class="driver-name">Raju</b>
-                    <small>KA01AB1234 • 4.9★</small>
-                </div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar"><div class="progress animated-progress"></div></div>
-            </div>
-            <button class="danger-btn" onclick="endTrip()">End Trip (Demo)</button>
-        </section>
-
-        <section id="rating-screen" class="screen">
-            <h3>Trip Completed</h3>
-            <div class="summary">
-                <span>Total Paid:</span>
-                <span class="amount">₹130</span>
-            </div>
-            <p>Rate your experience</p>
-            <div id="star-rating">
-                <span class="star" onclick="setRating(1)">★</span>
-                <span class="star" onclick="setRating(2)">★</span>
-                <span class="star" onclick="setRating(3)">★</span>
-                <span class="star" onclick="setRating(4)">★</span>
-                <span class="star" onclick="setRating(5)">★</span>
-            </div>
-            <button class="primary-btn" onclick="location.reload()">Back to Home</button>
-        </section>
-        
-        <section id="driver-login-screen" class="screen">
-            <h3>Driver Login</h3>
-            <input type="email" placeholder="Driver Email">
-            <input type="password" placeholder="Password">
-            <button class="primary-btn" onclick="driverLogin()">Login as Driver</button>
-            <button class="secondary-btn" onclick="switchToCustomer()">Switch to Customer</button>
-        </section>
-
-        <section id="driver-home-screen" class="screen">
-            <h3>Driver Dashboard</h3>
-            <button class="primary-btn" onclick="goOnline()">Go Online</button>
-        </section>
-
-        <section id="driver-request-screen" class="screen">
-            <h3>New Ride Request</h3>
-            <div class="request-details">
-                <p><strong>Pickup:</strong> <span id="req-pickup">MG Road</span></p>
-                <p><strong>Drop:</strong> <span id="req-drop">BTM Layout</span></p>
-            </div>
-            <button class="primary-btn" onclick="acceptRide()">Accept</button>
-            <button class="danger-btn" onclick="rejectRide()">Reject</button>
-        </section>
-
-        <section id="driver-trip-screen" class="screen">
-            <h3>Current Trip</h3>
-            <div id="driver-nav-map" class="map-container"></div>
-            <div class="action-buttons">
-                <button class="primary-btn" onclick="arriveAtPickup()">Arrived at Pickup</button>
-                <button class="primary-btn" onclick="startRide()">Start Trip</button>
-                <button class="danger-btn" onclick="endDriverTrip()">End Trip</button>
-            </div>
-        </section>
-    </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="javascript.js"></script>
-</body>
-</html>
+<body class="overflow-x-hidden selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-neutral-950/60 backdrop-blur-xl flex justify-between items-center px-8 py-4 shadow-[0_8px_32px_rgba(63,255,139,0.08)]">
+<div class="flex items-center gap-12">
+<div class="text-2xl font-black text-emerald-400 italic font-manrope font-bold tracking-tight">KINETIC</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-manrope font-bold tracking-tight text-emerald-400 border-b-2 border-emerald-400 pb-1 hover:text-emerald-300 transition-colors duration-300 active:scale-95 transition-transform" href="#">Rides</a>
+<a class="font-manrope font-bold tracking-tight text-neutral-400 hover:text-emerald-300 transition-colors duration-300 active:scale-95 transition-transform" href="#">Safety</a>
+<a class="font-manrope font-bold tracking-tight text-neutral-400 hover:text-emerald-300 transition-colors duration-300 active:scale-95 transition-transform" href="#">Support</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<button onclick="window.location.href='app.html'" class="font-manrope font-bold tracking-tight text-neutral-400 hover:text-emerald-300 transition-colors duration-300 active:scale-95 transition-transform">Login</button>
+<button onclick="window.location.href='app.html'" class="bg-primary text-on-primary font-manrope font-bold tracking-tight px-6 py-2 rounded-lg hover:bg-primary-container transition-all active:scale-95">Sign Up</button>
+</div>
+</header>
+<!-- Hero Section with Interactive Map Background -->
+<main class="relative h-screen w-full flex items-center pt-20">
+<!-- Background Map Image -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover filter grayscale contrast-125 brightness-50" data-alt="Modern dark-themed digital map showing city streets with neon green route highlights and subtle glowing vehicle markers" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4uy4czTtXnUi3vww6fphmoeuNBTd1kf6EUWq3pBfAamwYhRwiEhfqJfPFoyOTPr6yHEOBemDSxfL7XQkMDTrAIUSCpEGPwYlOW2rhxyJ3aFMpo1BeWDNEa3mQD8kyfbfKuKBUyZWru3CIqqfvW3_QUcyw5FG4m7Jl-KiAVARIuiL6j2ZpI_lYNf6dsHg3Hp4wyyZV_7epS9MSa-_nj2adJLq2pbWlcCTfehhJLvMSqr-ZOXacth-Id6Vh8zisED2oVJY1jTACi_g"/>
+<div class="absolute inset-0 map-gradient-overlay"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+<!-- Hero Content Area -->
+<div class="relative z-10 container mx-auto px-8 md:px-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="max-w-xl">
+<h1 class="text-5xl md:text-7xl font-headline font-extrabold tracking-tighter leading-tight mb-6">
+                    Move with <br/>
+<span class="text-primary italic">Electric Precision.</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl font-body mb-10 leading-relaxed">
+                    Experience the future of urban mobility. Premium rides, lightning-fast matching, and carbon-neutral city navigation.
+                </p>
+<!-- Booking Component (Bento-style Glass Card) -->
+<div class="kinetic-glass p-8 rounded-xl border border-outline-variant/15 shadow-2xl">
+<div class="space-y-4">
+<div class="relative group">
+<div class="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-sm">radio_button_checked</span>
+<div class="w-px h-8 bg-outline-variant/30 my-1"></div>
+<span class="material-symbols-outlined text-tertiary text-sm">location_on</span>
+</div>
+<div class="pl-12 space-y-3">
+<div class="bg-surface-container-highest/50 rounded-lg p-3 group-focus-within:ring-1 ring-primary/20 transition-all">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Pickup Location</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder:text-neutral-600 font-medium" placeholder="Enter pickup location" type="text"/>
+</div>
+<div class="bg-surface-container-highest/50 rounded-lg p-3 group-focus-within:ring-1 ring-primary/20 transition-all">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Where to?</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder:text-neutral-600 font-medium" placeholder="Enter destination" type="text"/>
+</div>
+</div>
+</div>
+<div class="flex gap-3 pt-2">
+<button onclick="window.location.href='app.html'" class="flex-1 bg-primary text-on-primary font-manrope font-bold py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95 shadow-[0_12px_24px_rgba(63,255,139,0.15)]">
+                                Find a Ride
+                                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-16 kinetic-glass border border-outline-variant/20 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">schedule</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Ride Selection Preview (Asymmetrical Desktop Only) -->
+<div class="hidden lg:flex flex-col gap-4 self-start mt-20">
+<div class="kinetic-glass p-6 rounded-xl border border-outline-variant/15 transform translate-x-12 translate-y-4 rotate-1 max-w-sm">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface">Kinetic Luxe</h3>
+<p class="text-xs text-on-surface-variant">Top-tier comfort, silent EVs</p>
+</div>
+<span class="text-primary font-bold">$24.50</span>
+</div>
+<img class="w-full h-40 object-cover rounded-lg mb-4" data-alt="Sleek black high-end electric luxury sedan parked on a city street at night with neon reflections on its polished surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACIdgzgi_Ls5aG3amT4i55h40DiFbG0m7HcuGptAhva45ln71cTt5BAuHEaPqcnr1WjQfmQSZ2F8fyDNO8jId0qprFFKhX-34K8B38GNtKByrkxdsNZLMOSgGZt-QSb4yQYOpfilram9H3EeRud_Vn_sp6M4DsRQ0SJal5CbAX-1GAevhx60enuhYOwgvucrELPxORf9dwvxefZ8mchUQm-7PApVArWLNIGFTFmlhx2zna8XoKI-ZuQDDKYMqFwzJZtuKgskn4IoE"/>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="text-xs font-bold text-primary tracking-widest uppercase">Arrival in 3 mins</span>
+</div>
+</div>
+<div class="kinetic-glass p-4 rounded-xl border border-outline-variant/15 transform -translate-x-8 max-w-xs flex items-center gap-4">
+<div class="h-12 w-12 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Verified Drivers Only</p>
+<p class="text-[10px] text-on-surface-variant">24/7 Safety Monitoring Active</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Features Section -->
+<section class="bg-surface relative py-24 overflow-hidden">
+<div class="container mx-auto px-8 md:px-16">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-xl">
+<h2 class="text-4xl font-headline font-extrabold tracking-tight mb-4">Why choose <span class="text-primary italic">Kinetic</span>?</h2>
+<p class="text-on-surface-variant leading-relaxed">We've reimagined urban transit. It's not just a ride; it's a statement of efficiency and style.</p>
+</div>
+<div class="flex gap-4">
+<button class="h-12 w-12 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors">
+<span class="material-symbols-outlined">west</span>
+</button>
+<button class="h-12 w-12 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors">
+<span class="material-symbols-outlined">east</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface-container-low p-8 rounded-xl group hover:bg-surface-container-high transition-all">
+<div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-8 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary">electric_car</span>
+</div>
+<h4 class="text-xl font-headline font-bold mb-3">Eco-Pulse Fleet</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Our entire fleet consists of high-performance electric vehicles, reducing your carbon footprint without sacrificing speed.</p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-low p-8 rounded-xl group hover:bg-surface-container-high transition-all">
+<div class="w-14 h-14 bg-tertiary/10 rounded-lg flex items-center justify-center mb-8 group-hover:bg-tertiary transition-colors">
+<span class="material-symbols-outlined text-tertiary group-hover:text-on-tertiary">shield_with_heart</span>
+</div>
+<h4 class="text-xl font-headline font-bold mb-3">Guardian Protocol</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Advanced biometric verification and real-time route monitoring ensure every journey is protected by our elite security matrix.</p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-low p-8 rounded-xl group hover:bg-surface-container-high transition-all">
+<div class="w-14 h-14 bg-secondary/10 rounded-lg flex items-center justify-center mb-8 group-hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined text-secondary group-hover:text-on-secondary">schedule</span>
+</div>
+<h4 class="text-xl font-headline font-bold mb-3">Precision Arrival</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Our predictive algorithms ensure a ride is always within a 4-minute radius, keeping your schedule perfectly on track.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- App Preview / CTA -->
+<section class="relative bg-surface py-20 px-8">
+<div class="container mx-auto">
+<div class="bg-gradient-to-r from-surface-container-low to-surface-container-highest rounded-3xl p-12 overflow-hidden relative flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 z-10">
+<h2 class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight mb-6">Your city, <br/>in your pocket.</h2>
+<p class="text-on-surface-variant mb-10 max-w-md">Download the Kinetic app for the full experience. Exclusive member pricing, priority booking, and real-time fleet tracking.</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-on-surface text-background px-8 py-3 rounded-lg font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">ios</span>
+                            App Store
+                        </button>
+<button class="bg-on-surface text-background px-8 py-3 rounded-lg font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">play_arrow</span>
+                            Google Play
+                        </button>
+</div>
+</div>
+<div class="flex-1 relative">
+<div class="relative w-64 md:w-80 h-[500px] bg-neutral-900 rounded-[3rem] border-[8px] border-neutral-800 shadow-2xl overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Smartphone screen showing a modern dark mode ride-sharing interface with map and route path in neon green" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHvZiO5u3FCFwGEKQDWZd_InKH4jze9z93qCt6rwpo56A4q-qsYI2U8YybK981fiE5iI9vZkqlZX5-Ogeo5TrAl3qh6yj2BRg6X9g5Gvp2lxP9YU7OQV1kwAv4KaVFK88qhUq3HIJPospRJ6bG1i4VAIatgkU2ICrMwNd-9I8P30q2NgpmAZXn4n2GD6QqFZXZMcXYJ-5XDUm3Zi6gmo2pz8pDAsY_N1QMaxrXY3bN_c3_hu9cFDjarWoBEq2OLl01X_EMSE4p6HM"/>
+<div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black to-transparent">
+<div class="bg-primary/20 backdrop-blur-md rounded-xl p-3 border border-primary/20">
+<div class="flex justify-between items-center text-[10px] text-primary font-black uppercase mb-1">
+<span>Ride Active</span>
+<span>2.4 mi</span>
+</div>
+<div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Minimal Footer -->
+<footer class="bg-surface py-12 px-8 border-t border-outline-variant/10">
+<div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="text-xl font-black text-emerald-400 italic font-manrope">KINETIC</div>
+<div class="flex gap-8 text-sm text-on-surface-variant font-medium">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+<a class="hover:text-primary transition-colors" href="#">Cities</a>
+<a class="hover:text-primary transition-colors" href="#">Safety</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">language</span>
+<span class="text-sm font-bold">EN-US</span>
+</div>
+</div>
+<div class="container mx-auto mt-8 text-center md:text-left">
+<p class="text-xs text-on-surface-variant/50">© 2024 KINETIC MOBILITY INC. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+</body></html>
