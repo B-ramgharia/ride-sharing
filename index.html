@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ride Sharing Premium App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h2>Ride Sharing</h2>
+            <div class="logo-circle" id="header-logo">
+                <img src="/assets/images/logo.png" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerText='RS';">
+            </div>
+        </header>
+
+        <section id="login-screen" class="screen active">
+            <h3>Customer Login</h3>
+            <input id="login-email" type="email" placeholder="Email Address">
+            <input id="login-password" type="password" placeholder="Password">
+            <button class="primary-btn" onclick="login()">Login to Account</button>
+            <button class="secondary-btn" onclick="switchToDriver()">Switch to Driver Mode</button>
+        </section>
+
+        <section id="location-screen" class="screen">
+            <h3>Book a Ride</h3>
+            <div class="input-group">
+                <input id="pickup" type="text" placeholder="Enter Pickup Location">
+                <input id="drop" type="text" placeholder="Enter Drop Location">
+            </div>
+            <div id="map" class="map-container"></div>
+            <button class="primary-btn" onclick="findRides()">Next: Select Ride Type</button>
+        </section>
+
+        <section id="ride-type-screen" class="screen">
+            <h3>Select Ride</h3>
+            <div class="ride-type">
+                <label>
+                    <input type="radio" name="rideType" value="Bike" checked>
+                    <div class="ride-card">
+                        <span class="ride-name">Bike</span>
+                        <span class="ride-price">₹40</span>
+                    </div>
+                </label>
+                <label>
+                    <input type="radio" name="rideType" value="Mini">
+                    <div class="ride-card">
+                        <span class="ride-name">Mini</span>
+                        <span class="ride-price">₹60</span>
+                    </div>
+                </label>
+                <label>
+                    <input type="radio" name="rideType" value="Sedan">
+                    <div class="ride-card">
+                        <span class="ride-name">Sedan</span>
+                        <span class="ride-price">₹80</span>
+                    </div>
+                </label>
+            </div>
+            <button class="primary-btn" onclick="confirmBooking()">Confirm Booking</button>
+        </section>
+
+        <section id="track-driver-screen" class="screen">
+            <h3>Driver is Arriving...</h3>
+            <div id="driver-map" class="map-container"></div>
+            <div class="driver-info">
+                <div class="driver-photo"></div>
+                <div class="driver-details">
+                    <b class="driver-name">Raju</b>
+                    <small>KA01AB1234 • 4.9★</small>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"><div class="progress animated-progress"></div></div>
+            </div>
+            <button class="danger-btn" onclick="endTrip()">End Trip (Demo)</button>
+        </section>
+
+        <section id="rating-screen" class="screen">
+            <h3>Trip Completed</h3>
+            <div class="summary">
+                <span>Total Paid:</span>
+                <span class="amount">₹130</span>
+            </div>
+            <p>Rate your experience</p>
+            <div id="star-rating">
+                <span class="star" onclick="setRating(1)">★</span>
+                <span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span>
+                <span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
+            </div>
+            <button class="primary-btn" onclick="location.reload()">Back to Home</button>
+        </section>
+        
+        <section id="driver-login-screen" class="screen">
+            <h3>Driver Login</h3>
+            <input type="email" placeholder="Driver Email">
+            <input type="password" placeholder="Password">
+            <button class="primary-btn" onclick="driverLogin()">Login as Driver</button>
+            <button class="secondary-btn" onclick="switchToCustomer()">Switch to Customer</button>
+        </section>
+
+        <section id="driver-home-screen" class="screen">
+            <h3>Driver Dashboard</h3>
+            <button class="primary-btn" onclick="goOnline()">Go Online</button>
+        </section>
+
+        <section id="driver-request-screen" class="screen">
+            <h3>New Ride Request</h3>
+            <div class="request-details">
+                <p><strong>Pickup:</strong> <span id="req-pickup">MG Road</span></p>
+                <p><strong>Drop:</strong> <span id="req-drop">BTM Layout</span></p>
+            </div>
+            <button class="primary-btn" onclick="acceptRide()">Accept</button>
+            <button class="danger-btn" onclick="rejectRide()">Reject</button>
+        </section>
+
+        <section id="driver-trip-screen" class="screen">
+            <h3>Current Trip</h3>
+            <div id="driver-nav-map" class="map-container"></div>
+            <div class="action-buttons">
+                <button class="primary-btn" onclick="arriveAtPickup()">Arrived at Pickup</button>
+                <button class="primary-btn" onclick="startRide()">Start Trip</button>
+                <button class="danger-btn" onclick="endDriverTrip()">End Trip</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/javascript.js"></script>
+</body>
+</html>
