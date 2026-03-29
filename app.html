@@ -172,20 +172,22 @@
                     <div class="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 pointer-events-auto">
                         <div class="md:col-span-7 kinetic-glass bg-surface-container-low/80 p-6 rounded-2xl shadow-2xl border border-white/5">
                             <div class="flex flex-col gap-4">
-                                <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-primary/10 group focus-within:border-primary/40 transition-all">
+                                <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-primary/10 group focus-within:border-primary/40 transition-all relative z-50">
                                     <span class="material-symbols-outlined text-primary">my_location</span>
                                     <div class="flex flex-col w-full text-left">
                                         <span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest leading-none mb-1">Pick Up</span>
-                                        <input id="pickup" class="bg-transparent border-none p-0 text-white font-headline font-bold focus:ring-0 w-full outline-none" type="text" value="Locating..." placeholder="Search Pickup Location"/>
+                                        <input id="pickup" class="bg-transparent border-none p-0 text-white font-headline font-bold focus:ring-0 w-full outline-none" type="text" value="Locating..." placeholder="Search Pickup Location" autocomplete="off"/>
                                     </div>
+                                    <div id="pickup-suggestions" class="hidden absolute top-[110%] left-0 w-full bg-surface-container-high border border-outline-variant/30 rounded-xl shadow-2xl z-[100] max-h-64 overflow-y-auto overflow-x-hidden"></div>
                                 </div>
-                                <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-white/5 group focus-within:border-primary/40 transition-all">
+                                <div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-white/5 group focus-within:border-primary/40 transition-all relative z-40">
                                     <span class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors">location_on</span>
                                     <div class="flex flex-col w-full text-left">
                                         <span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest leading-none mb-1 group-focus-within:text-primary transition-colors">Destination</span>
-                                        <input id="drop" class="bg-transparent border-none p-0 text-white font-headline font-bold placeholder:text-neutral-600 focus:ring-0 w-full outline-none" placeholder="Where to?" type="text"/>
+                                        <input id="drop" class="bg-transparent border-none p-0 text-white font-headline font-bold placeholder:text-neutral-600 focus:ring-0 w-full outline-none" placeholder="Where to?" type="text" autocomplete="off"/>
                                     </div>
                                     <span class="material-symbols-outlined text-neutral-600">add_circle</span>
+                                    <div id="drop-suggestions" class="hidden absolute top-[110%] left-0 w-full bg-surface-container-high border border-outline-variant/30 rounded-xl shadow-2xl z-[100] max-h-64 overflow-y-auto overflow-x-hidden"></div>
                                 </div>
                             </div>
                         </div>
@@ -500,6 +502,73 @@
                 s.style.fontVariationSettings = i < n ? "'FILL' 1" : "'FILL' 0";
             });
         }
+        
+        // Location Autocomplete Dropdown Logic
+        let autocompleteTimeout;
+        async function fetchSuggestions(query, type) {
+            const list = document.getElementById(type + '-suggestions');
+            if(query.length < 3) { list.classList.add('hidden'); return; }
+            
+            list.innerHTML = `<div class="p-4 text-center text-sm text-neutral-400"><span class="material-symbols-outlined animate-spin text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">refresh</span>Searching...</div>`;
+            list.classList.remove('hidden');
+            
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
+                const data = await res.json();
+                list.innerHTML = '';
+                
+                if(data.length === 0) {
+                    list.innerHTML = `<div class="p-4 text-center text-sm text-neutral-400">No results found</div>`; return;
+                }
+                
+                if(type === 'pickup') {
+                    const locDiv = document.createElement('div');
+                    locDiv.className = "flex items-center gap-4 p-4 hover:bg-white/5 cursor-pointer border-b border-white/5 transition-colors";
+                    locDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-sm font-bold" style="font-variation-settings: 'FILL' 1;">my_location</span></div><div class="flex flex-col text-left"><span class="text-sm font-bold text-emerald-400">Use Current Location</span><span class="text-xs text-neutral-400">Enable GPS access to locate precisely</span></div>`;
+                    locDiv.onclick = () => { getCurrentLocation(); list.classList.add('hidden'); document.getElementById('pickup').value = "Locating..."; };
+                    list.appendChild(locDiv);
+                }
+
+                data.forEach(item => {
+                    let mainText = item.name || (item.address && (item.address.road || item.address.suburb)) || "Location";
+                    let subText = item.display_name;
+                    const div = document.createElement('div');
+                    div.className = "flex items-center gap-4 p-4 hover:bg-white/5 cursor-pointer border-b border-white/5 transition-colors last:border-0";
+                    div.innerHTML = `<div class="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-neutral-400 text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span></div><div class="flex flex-col text-left overflow-hidden"><span class="text-sm font-bold text-white truncate w-full">${mainText}</span><span class="text-xs text-neutral-500 truncate w-full">${subText}</span></div>`;
+                    div.onclick = () => {
+                        document.getElementById(type).value = item.display_name.split(',').slice(0, 3).join(',').trim();
+                        if(type === 'pickup') { window.userLat = parseFloat(item.lat); window.userLon = parseFloat(item.lon); }
+                        list.classList.add('hidden');
+                    };
+                    list.appendChild(div);
+                });
+
+            } catch(e) { list.innerHTML = `<div class="p-4 text-center text-sm text-red-400">Network Error. Try again.</div>`; }
+        }
+
+        document.getElementById('pickup').addEventListener('input', (e) => {
+            clearTimeout(autocompleteTimeout);
+            autocompleteTimeout = setTimeout(() => fetchSuggestions(e.target.value, 'pickup'), 300);
+        });
+        document.getElementById('pickup').addEventListener('focus', (e) => {
+            if(e.target.value && e.target.value !== "Locating...") fetchSuggestions(e.target.value, 'pickup');
+        });
+        document.getElementById('drop').addEventListener('input', (e) => {
+            clearTimeout(autocompleteTimeout);
+            autocompleteTimeout = setTimeout(() => fetchSuggestions(e.target.value, 'drop'), 300);
+        });
+        document.getElementById('drop').addEventListener('focus', (e) => {
+            if(e.target.value) fetchSuggestions(e.target.value, 'drop');
+        });
+
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('#pickup') && !e.target.closest('#pickup-suggestions')) {
+                const pList = document.getElementById('pickup-suggestions'); if(pList) pList.classList.add('hidden');
+            }
+            if(!e.target.closest('#drop') && !e.target.closest('#drop-suggestions')) {
+                const dList = document.getElementById('drop-suggestions'); if(dList) dList.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
