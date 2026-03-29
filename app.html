@@ -313,7 +313,57 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="javascript.js"></script>
     <script>
-        setTimeout(() => { show('location-screen'); }, 50);
+        setTimeout(() => { show('location-screen'); getCurrentLocation(); }, 50);
+
+        // Geolocation Logic for Auto-Pickup
+        async function getCurrentLocation() {
+            const pickupInput = document.getElementById('pickup');
+            if(!pickupInput) return;
+            
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+                        const data = await response.json();
+                        let address = "Current Location";
+                        if (data && data.address) {
+                            const road = data.address.road || data.address.suburb || data.address.neighbourhood || "";
+                            const city = data.address.city || data.address.town || data.address.village || data.address.state || "";
+                            
+                            if (road && city) {
+                                address = `${road}, ${city}`;
+                            } else if (data.display_name) {
+                                address = data.display_name.split(',').slice(0, 2).join(',').trim(); 
+                            }
+                        }
+                        pickupInput.value = address;
+                        
+                        // Center map on user location and add pulsing dot
+                        if (typeof mapInstance !== 'undefined' && mapInstance) {
+                            mapInstance.setView([lat, lon], 15);
+                            let userIcon = L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `<div class="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-[0_0_15px_rgba(63,255,139,0.8)] animate-pulse"></div>`,
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8]
+                            });
+                            L.marker([lat, lon], {icon: userIcon}).addTo(mapInstance);
+                        }
+                    } catch (e) {
+                        console.error("Geocoding failed", e);
+                        pickupInput.value = "Current Location";
+                    }
+                }, (error) => {
+                    console.error("Geolocation denied", error);
+                    pickupInput.value = "Enter Pickup Location";
+                }, { timeout: 10000 });
+            } else {
+                pickupInput.value = "Enter Pickup Location";
+            }
+        }
 
         // Dynamic time-based greeting logic
         function updateGreeting() {
