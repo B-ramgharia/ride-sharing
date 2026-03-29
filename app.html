@@ -100,7 +100,7 @@
             <a class="flex items-center gap-3 bg-emerald-500/10 text-emerald-400 rounded-lg px-4 py-3 mx-2 font-manrope text-sm font-semibold active:translate-x-1 transition-transform cursor-pointer">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span><span>Activity</span>
             </a>
-            <a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all cursor-pointer">
+            <a onclick="showActivity()" class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all cursor-pointer">
                 <span class="material-symbols-outlined">history</span><span>Activity</span>
             </a>
             <a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all cursor-pointer">
@@ -284,12 +284,32 @@
                         <span class="material-symbols-outlined text-6xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">task_alt</span>
                         <h3 class="font-headline text-3xl font-bold mb-2">Trip Completed</h3>
                         <div class="text-xs text-neutral-500 mb-4 tracking-widest uppercase">Total Fare</div>
-                        <div class="text-5xl font-black text-white mb-8 drop-shadow-lg">₹130</div>
+                        <div id="final-price-display" class="text-5xl font-black text-white mb-8 drop-shadow-lg">₹120</div>
                         <p class="text-neutral-400 mb-4 text-sm font-bold uppercase tracking-wider">Rate your experience</p>
                         <div id="star-rating" class="flex justify-center gap-2 mb-10">
                             <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(1)">star</span><span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(2)">star</span><span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(3)">star</span><span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(4)">star</span><span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(5)">star</span>
                         </div>
                         <button onclick="location.href='app.html'" class="w-full px-8 py-5 rounded-2xl bg-primary text-black font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_30px_rgba(63,255,139,0.3)] hover:brightness-110 active:scale-95 transition-all">Back to Home</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="activity-screen" class="screen relative h-full w-full">
+                <div class="h-full w-full flex flex-col justify-start p-6 md:p-10 pt-24 overflow-y-auto pointer-events-auto bg-neutral-950/40 backdrop-blur-sm">
+                    <div class="w-full max-w-4xl mx-auto">
+                        <div class="flex items-center justify-between mb-8">
+                            <h2 class="font-headline text-4xl font-extrabold text-white">Your <span class="text-primary italic">Activity</span></h2>
+                            <button onclick="show('location-screen')" class="p-2 rounded-full hover:bg-white/10 transition-all"><span class="material-symbols-outlined text-2xl">close</span></button>
+                        </div>
+                        
+                        <div id="activity-list" class="flex flex-col gap-4">
+                            <!-- Activity items will be injected here -->
+                            <div class="animate-pulse flex flex-col gap-4">
+                                <div class="h-24 bg-surface-container rounded-2xl"></div>
+                                <div class="h-24 bg-surface-container rounded-2xl"></div>
+                                <div class="h-24 bg-surface-container rounded-2xl"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -486,43 +506,119 @@
                             icon: L.divIcon({ html: `<div class="w-6 h-6 bg-black rounded-full border-4 border-white shadow-xl flex items-center justify-center"><div class="w-2 h-2 bg-white"></div></div>`, iconSize:[24,24], iconAnchor:[12,12]})
                         }).addTo(window.mapInstance);
                         
-                        // Update Prices: exactly 12rs per km
-                        const basePrice = Math.max(12, Math.floor(distanceKm * 12));
-                        document.getElementById('price-bike').innerText = '₹' + Math.floor(basePrice * 0.8);
-                        document.getElementById('price-mini').innerText = '₹' + basePrice;
-                        document.getElementById('price-sedan').innerText = '₹' + Math.floor(basePrice * 1.5);
-                        
-                        document.getElementById('dist-bike').innerText = distanceKm + ' km';
-                        document.getElementById('dist-mini').innerText = distanceKm + ' km';
-                        document.getElementById('dist-sedan').innerText = distanceKm + ' km';
+            // Update Trip Completed Price
+            document.getElementById('final-price-display').innerText = '₹' + basePrice;
 
-                        simulateNearestVehicles(pLat, pLon);
-                        
-                        if(realBtn) {
-                            realBtn.innerHTML = `<span class="material-symbols-outlined animate-ping text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">radar</span> FINDING NEARBY DRIVERS...`;
-                        }
-                        
-                        // Store route for animation
-                        window.latestRouteGeometry = route.geometry;
-
-                        await new Promise(r => setTimeout(r, 2500));
-                    }
-                } else {
-                    alert("Could not find destination location. Please try another address.");
-                }
-            } catch(e) { console.error("Routing error:", e); }
+            simulateNearestVehicles(pLat, pLon);
             
-            if(realBtn) { realBtn.innerText = originalText; realBtn.disabled = false; }
-            originalFindRides();
-        };
+            if(realBtn) {
+                realBtn.innerHTML = `<span class="material-symbols-outlined animate-ping text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">radar</span> FINDING NEARBY DRIVERS...`;
+            }
+            
+            // Store route for animation and DB
+            window.latestRouteData = {
+                pickup: document.getElementById('pickup').value,
+                drop: document.getElementById('drop').value,
+                price: basePrice,
+                distance: distanceKm + ' km',
+                geometry: route.geometry
+            };
 
-        window.confirmBooking = function() {
-            toggleMap(true); originalConfirmBooking();
-            setTimeout(() => { 
-                if (mapInstance) mapInstance.invalidateSize(); 
-                if (window.latestRouteGeometry) startTripAnimation(window.latestRouteGeometry);
-            }, 200);
-        };
+            await new Promise(r => setTimeout(r, 2500));
+        }
+    } else {
+        alert("Could not find destination location. Please try another address.");
+    }
+} catch(e) { console.error("Routing error:", e); }
+
+if(realBtn) { realBtn.innerText = originalText; realBtn.disabled = false; }
+originalFindRides();
+};
+
+const originalConfirmBooking = window.confirmBooking;
+window.confirmBooking = function() {
+toggleMap(true); originalConfirmBooking();
+setTimeout(async () => { 
+    if (mapInstance) mapInstance.invalidateSize(); 
+    if (window.latestRouteData) {
+        startTripAnimation(window.latestRouteData.geometry);
+        saveRideToDatabase(window.latestRouteData);
+    }
+}, 200);
+};
+
+async function saveRideToDatabase(rideData) {
+    const token = localStorage.getItem('token');
+    if(!token) return;
+
+    try {
+        await fetch('http://localhost:5000/api/rides', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                pickup: rideData.pickup,
+                drop: rideData.drop,
+                price: rideData.price,
+                distance: rideData.distance
+            })
+        });
+        console.log("Ride saved to history");
+    } catch (e) { console.error("Failed to save ride", e); }
+}
+
+async function showActivity() {
+    show('activity-screen');
+    const list = document.getElementById('activity-list');
+    const token = localStorage.getItem('token');
+    
+    if(!token) {
+        list.innerHTML = `<div class="p-10 text-center text-neutral-400 italic">Please login to view activity</div>`;
+        return;
+    }
+
+    try {
+        const res = await fetch('http://localhost:5000/api/rides', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const rides = await res.json();
+        list.innerHTML = '';
+
+        if(rides.length === 0) {
+            list.innerHTML = `<div class="p-20 text-center flex flex-col items-center gap-4 bg-surface-container/20 rounded-3xl border border-white/5">
+                <span class="material-symbols-outlined text-6xl text-neutral-800">electric_ride</span>
+                <p class="text-neutral-400 font-bold">No rides found yet. Start your journey today!</p>
+            </div>`;
+            return;
+        }
+
+        rides.forEach(ride => {
+            const dateStr = new Date(ride.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'kinetic-glass bg-surface-container-low/60 p-6 rounded-2xl border border-white/5 flex items-center justify-between group transition-all hover:bg-surface-container-highest';
+            item.innerHTML = `
+                <div class="flex items-center gap-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_car</span></div>
+                    <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-black text-primary uppercase tracking-tighter">${dateStr}</span>
+                            <span class="text-[8px] text-neutral-600">• ${ride.distance}</span>
+                        </div>
+                        <h4 class="font-headline font-bold text-lg text-on-surface line-clamp-1 w-64">${ride.drop}</h4>
+                        <p class="text-xs text-on-surface-variant line-clamp-1 w-64">From: ${ride.pickup}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-black text-white">₹${ride.price}</div>
+                    <div class="text-[10px] text-primary font-bold uppercase tracking-widest">Completed</div>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    } catch (e) { list.innerHTML = `<div class="p-10 text-center text-red-400 italic">Error loading history</div>`; }
+}
 
         async function startTripAnimation(geometry) {
             const coordinates = geometry.coordinates;
