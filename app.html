@@ -234,8 +234,8 @@
                                 <input type="radio" name="rideType" value="Bike" class="hidden peer">
                                 <div class="kinetic-glass bg-surface-container-low/80 p-6 rounded-3xl border border-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl text-left">
                                     <div class="flex justify-between items-center mb-2"><span class="font-headline font-bold text-xl">K-Sprint</span><span class="material-symbols-outlined text-neutral-500 group-hover:text-primary transition-all">two_wheeler</span></div>
-                                    <p class="text-xs text-neutral-400 mb-4 h-8">Fastest electric two-wheeler</p>
-                                    <span class="text-primary font-black text-2xl">₹40</span>
+                                    <p class="text-xs text-neutral-400 mb-4 h-8">Fastest electric two-wheeler • <span id="dist-bike" class="text-primary"></span></p>
+                                    <span id="price-bike" class="text-primary font-black text-2xl">₹40</span>
                                 </div>
                             </label>
                             
@@ -243,8 +243,8 @@
                                 <input type="radio" name="rideType" value="Mini" checked class="hidden peer">
                                 <div class="kinetic-glass bg-surface-container-low/80 p-6 rounded-3xl border border-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl text-left">
                                     <div class="flex justify-between items-center mb-2"><span class="font-headline font-bold text-xl">K-Mini</span><span class="material-symbols-outlined text-neutral-500 peer-checked:text-primary transition-all">airport_shuttle</span></div>
-                                    <p class="text-xs text-neutral-400 mb-4 h-8">Everyday EV comfort for two</p>
-                                    <span class="text-primary font-black text-2xl">₹60</span>
+                                    <p class="text-xs text-neutral-400 mb-4 h-8">Everyday EV comfort for two • <span id="dist-mini" class="text-primary"></span></p>
+                                    <span id="price-mini" class="text-primary font-black text-2xl">₹60</span>
                                 </div>
                             </label>
                             
@@ -253,8 +253,8 @@
                                 <div class="kinetic-glass bg-surface-container-low/80 p-6 rounded-3xl border border-white/5 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl relative overflow-hidden text-left">
                                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[40px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                     <div class="flex justify-between items-center mb-2"><span class="font-headline font-bold text-xl">K-Luxe</span><span class="material-symbols-outlined text-neutral-500 peer-checked:text-primary transition-all">directions_car</span></div>
-                                    <p class="text-xs text-neutral-400 mb-4 h-8 flex items-center gap-1">Top-tier silent EVs <span class="material-symbols-outlined text-xs text-primary">bolt</span></p>
-                                    <span class="text-primary font-black text-2xl">₹80</span>
+                                    <p class="text-xs text-neutral-400 mb-4 h-8 flex items-center gap-1">Top-tier silent EVs <span class="material-symbols-outlined text-xs text-primary">bolt</span> • <span id="dist-sedan" class="text-primary"></span></p>
+                                    <span id="price-sedan" class="text-primary font-black text-2xl">₹80</span>
                                 </div>
                             </label>
                         </div>
@@ -324,6 +324,7 @@
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
+                    window.userLat = lat; window.userLon = lon;
                     
                     try {
                         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
@@ -389,11 +390,86 @@
              document.getElementById('driver-map').style.display = showDriver ? 'block' : 'none';
         }
         
+        function simulateNearestVehicles(lat, lon) {
+            if(window.vehicleMarkers) window.vehicleMarkers.forEach(m => window.mapInstance.removeLayer(m));
+            window.vehicleMarkers = [];
+            const carIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="bg-surface p-1 rounded-full border border-primary shadow-[0_0_10px_rgba(63,255,139,0.5)]"><span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">directions_car</span></div>`,
+                iconSize: [28, 28], iconAnchor: [14, 14]
+            });
+            for(let i=0; i<4; i++) {
+                const offsetLat = lat + (Math.random() - 0.5) * 0.015;
+                const offsetLon = lon + (Math.random() - 0.5) * 0.015;
+                const marker = L.marker([offsetLat, offsetLon], {icon: carIcon}).addTo(window.mapInstance);
+                window.vehicleMarkers.push(marker);
+                setInterval(() => {
+                    const newLat = marker.getLatLng().lat + (Math.random() - 0.5) * 0.001;
+                    const newLon = marker.getLatLng().lng + (Math.random() - 0.5) * 0.001;
+                    marker.setLatLng([newLat, newLon]);
+                }, 2000);
+            }
+        }
+
         const originalFindRides = window.findRides;
-        window.findRides = function() {
-            if(!document.getElementById('pickup').value || !document.getElementById('drop').value) {
+        window.findRides = async function() {
+            const dropValue = document.getElementById('drop').value;
+            const pickupValue = document.getElementById('pickup').value;
+            if(!dropValue || !pickupValue) {
                 alert("Please enter pickup and drop locations"); return;
             }
+            
+            const btn = event ? event.target || event.srcElement : null;
+            let originalText = "Request Pulse Ride";
+            if(btn && btn.tagName === 'BUTTON') {
+                originalText = btn.innerText;
+                btn.innerText = "Routing..."; btn.disabled = true;
+            }
+
+            try {
+                const dropRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropValue)}&format=json&limit=1`);
+                const dropData = await dropRes.json();
+                if(dropData && dropData.length > 0) {
+                    const dropLat = parseFloat(dropData[0].lat); const dropLon = parseFloat(dropData[0].lon);
+                    
+                    let pLat = window.userLat || 28.6139; let pLon = window.userLon || 77.2090;
+                    
+                    const routeRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${pLon},${pLat};${dropLon},${dropLat}?overview=full&geometries=geojson`);
+                    const routeData = await routeRes.json();
+                    
+                    if(routeData.routes && routeData.routes.length > 0) {
+                        const route = routeData.routes[0];
+                        const distanceKm = (route.distance / 1000).toFixed(1);
+                        
+                        if(window.currentRoute) window.mapInstance.removeLayer(window.currentRoute);
+                        window.currentRoute = L.geoJSON(route.geometry, {
+                            style: { color: '#3fff8b', weight: 4, opacity: 0.9, dashArray: '10, 10' }
+                        }).addTo(window.mapInstance);
+                        
+                        window.mapInstance.fitBounds(window.currentRoute.getBounds(), { padding: [60, 60] });
+
+                        if(window.dropMarker) window.mapInstance.removeLayer(window.dropMarker);
+                        window.dropMarker = L.marker([dropLat, dropLon], {
+                            icon: L.divIcon({ html: `<span class="material-symbols-outlined text-red-500 drop-shadow-lg" style="font-variation-settings: 'FILL' 1; font-size: 32px; transform:translate(-8px,-24px)">location_on</span>`})
+                        }).addTo(window.mapInstance);
+                        
+                        const basePrice = Math.max(50, Math.floor(50 + (16 * distanceKm)));
+                        document.getElementById('price-bike').innerText = '₹' + Math.floor(basePrice * 0.6);
+                        document.getElementById('price-mini').innerText = '₹' + basePrice;
+                        document.getElementById('price-sedan').innerText = '₹' + Math.floor(basePrice * 1.5);
+                        
+                        document.getElementById('dist-bike').innerText = distanceKm + ' km';
+                        document.getElementById('dist-mini').innerText = distanceKm + ' km';
+                        document.getElementById('dist-sedan').innerText = distanceKm + ' km';
+
+                        simulateNearestVehicles(pLat, pLon);
+                    }
+                } else {
+                    console.log("No valid drop location found, reverting to fallback animation.");
+                }
+            } catch(e) { console.error("Routing error:", e); }
+            
+            if(btn && btn.tagName === 'BUTTON') { btn.innerText = originalText; btn.disabled = false; }
             originalFindRides();
         };
 
