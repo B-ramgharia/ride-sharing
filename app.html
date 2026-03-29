@@ -327,8 +327,6 @@
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
                     window.userLat = lat; window.userLon = lon;
-                    window.lastAutoAddress = address; // Keep track of geolocated address
-                    
                     try {
                         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
                         const data = await response.json();
@@ -344,6 +342,7 @@
                             }
                         }
                         pickupInput.value = address;
+                        window.lastAutoAddress = address; // Track for routing logic
                         
                         // Center map on user location and add pulsing dot
                         if (typeof mapInstance !== 'undefined' && mapInstance) {
@@ -381,8 +380,9 @@
                 greeting = "Good afternoon";
                 subtitle = "Where to this afternoon? Your premium chauffeur is 4 mins away.";
             }
+            const userName = localStorage.getItem('user_name') || 'Guest';
             const titleEl = document.getElementById('greeting-title');
-            if (titleEl) titleEl.innerHTML = `${greeting}, <span class="text-primary italic">John.</span>`;
+            if (titleEl) titleEl.innerHTML = `${greeting}, <span class="text-primary italic">${userName}.</span>`;
             const subEl = document.getElementById('greeting-subtitle');
             if (subEl) subEl.innerText = subtitle;
         }
