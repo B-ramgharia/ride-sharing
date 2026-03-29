@@ -156,30 +156,36 @@
 </div>
 </div>
 <!-- Ride Selection Preview (Asymmetrical Desktop Only) -->
-<div class="hidden lg:flex flex-col gap-4 self-start mt-20">
-<div class="kinetic-glass p-6 rounded-xl border border-outline-variant/15 transform translate-x-12 translate-y-4 rotate-1 max-w-sm">
-<div class="flex justify-between items-start mb-6">
-<div>
-<h3 class="text-xl font-headline font-bold text-on-surface">Kinetic Luxe</h3>
-<p class="text-xs text-on-surface-variant">Top-tier comfort, silent EVs</p>
-</div>
-<span class="text-primary font-bold">$24.50</span>
-</div>
-<img class="w-full h-40 object-cover rounded-lg mb-4" data-alt="Sleek black high-end electric luxury sedan parked on a city street at night with neon reflections on its polished surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACIdgzgi_Ls5aG3amT4i55h40DiFbG0m7HcuGptAhva45ln71cTt5BAuHEaPqcnr1WjQfmQSZ2F8fyDNO8jId0qprFFKhX-34K8B38GNtKByrkxdsNZLMOSgGZt-QSb4yQYOpfilram9H3EeRud_Vn_sp6M4DsRQ0SJal5CbAX-1GAevhx60enuhYOwgvucrELPxORf9dwvxefZ8mchUQm-7PApVArWLNIGFTFmlhx2zna8XoKI-ZuQDDKYMqFwzJZtuKgskn4IoE"/>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
-<span class="text-xs font-bold text-primary tracking-widest uppercase">Arrival in 3 mins</span>
-</div>
-</div>
-<div class="kinetic-glass p-4 rounded-xl border border-outline-variant/15 transform -translate-x-8 max-w-xs flex items-center gap-4">
-<div class="h-12 w-12 rounded-full bg-secondary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-</div>
-<div>
-<p class="text-sm font-bold text-on-surface">Verified Drivers Only</p>
-<p class="text-[10px] text-on-surface-variant">24/7 Safety Monitoring Active</p>
-</div>
-</div>
+<div class="hidden lg:flex flex-col relative self-start mt-20 pl-16">
+    <!-- Main Card -->
+    <div class="relative z-10 kinetic-glass p-6 rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-sm hover:-translate-y-2 transition-transform duration-500">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h3 class="text-2xl font-headline font-bold text-on-surface tracking-tight">Kinetic Luxe</h3>
+                <p class="text-sm text-on-surface-variant mt-1">Top-tier comfort, silent EVs</p>
+            </div>
+            <span class="text-primary font-bold text-xl drop-shadow-[0_0_8px_rgba(63,255,139,0.5)]">$24.50</span>
+        </div>
+        <div class="relative rounded-xl overflow-hidden mb-5 group">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+            <img class="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-700" alt="Sleek black high-end electric luxury sedan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACIdgzgi_Ls5aG3amT4i55h40DiFbG0m7HcuGptAhva45ln71cTt5BAuHEaPqcnr1WjQfmQSZ2F8fyDNO8jId0qprFFKhX-34K8B38GNtKByrkxdsNZLMOSgGZt-QSb4yQYOpfilram9H3EeRud_Vn_sp6M4DsRQ0SJal5CbAX-1GAevhx60enuhYOwgvucrELPxORf9dwvxefZ8mchUQm-7PApVArWLNIGFTFmlhx2zna8XoKI-ZuQDDKYMqFwzJZtuKgskn4IoE"/>
+        </div>
+        <div class="flex items-center gap-3 bg-white/5 rounded-lg p-3 border border-white/5">
+            <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">bolt</span>
+            <span class="text-sm font-bold text-primary tracking-widest uppercase shadow-[0_0_10px_rgba(63,255,139,0.2)]">Arrival in 3 mins</span>
+        </div>
+    </div>
+    
+    <!-- Floating Badge overlaying the bottom-left -->
+    <div class="absolute -bottom-10 -left-6 z-20 kinetic-glass px-6 py-5 rounded-2xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)] flex items-center gap-5 hover:-translate-y-1 transition-transform duration-500">
+        <div class="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-[0_0_20px_rgba(63,255,139,0.3)]">
+            <span class="material-symbols-outlined text-black text-2xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+        </div>
+        <div>
+            <p class="text-base font-bold text-white tracking-wide">Verified Drivers Only</p>
+            <p class="text-xs text-neutral-400 mt-1">24/7 Safety Monitoring Active</p>
+        </div>
+    </div>
 </div>
 </div>
 </main>
