@@ -1,136 +1,332 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Ride Sharing Premium App</title>
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Kinetic - Premium Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="app">
-        <header>
-            <h2>Ride Sharing</h2>
-            <div class="logo-circle" id="header-logo">
-                <img src="./assets/images/logo.png" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerText='RS';">
-            </div>
-        </header>
-
-        <section id="login-screen" class="screen active">
-            <h3>Customer Login</h3>
-            <input id="login-email" type="email" placeholder="Email Address">
-            <input id="login-password" type="password" placeholder="Password">
-            <button class="primary-btn" onclick="login()">Login to Account</button>
-            <button class="secondary-btn" onclick="switchToDriver()">Switch to Driver Mode</button>
-        </section>
-
-        <section id="location-screen" class="screen">
-            <h3>Book a Ride</h3>
-            <div class="input-group">
-                <input id="pickup" type="text" placeholder="Enter Pickup Location">
-                <input id="drop" type="text" placeholder="Enter Drop Location">
-            </div>
-            <div id="map" class="map-container"></div>
-            <button class="primary-btn" onclick="findRides()">Next: Select Ride Type</button>
-        </section>
-
-        <section id="ride-type-screen" class="screen">
-            <h3>Select Ride</h3>
-            <div class="ride-type">
-                <label>
-                    <input type="radio" name="rideType" value="Bike" checked>
-                    <div class="ride-card">
-                        <span class="ride-name">Bike</span>
-                        <span class="ride-price">₹40</span>
-                    </div>
-                </label>
-                <label>
-                    <input type="radio" name="rideType" value="Mini">
-                    <div class="ride-card">
-                        <span class="ride-name">Mini</span>
-                        <span class="ride-price">₹60</span>
-                    </div>
-                </label>
-                <label>
-                    <input type="radio" name="rideType" value="Sedan">
-                    <div class="ride-card">
-                        <span class="ride-name">Sedan</span>
-                        <span class="ride-price">₹80</span>
-                    </div>
-                </label>
-            </div>
-            <button class="primary-btn" onclick="confirmBooking()">Confirm Booking</button>
-        </section>
-
-        <section id="track-driver-screen" class="screen">
-            <h3>Driver is Arriving...</h3>
-            <div id="driver-map" class="map-container"></div>
-            <div class="driver-info">
-                <div class="driver-photo"></div>
-                <div class="driver-details">
-                    <b class="driver-name">Raju</b>
-                    <small>KA01AB1234 • 4.9★</small>
-                </div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar"><div class="progress animated-progress"></div></div>
-            </div>
-            <button class="danger-btn" onclick="endTrip()">End Trip (Demo)</button>
-        </section>
-
-        <section id="rating-screen" class="screen">
-            <h3>Trip Completed</h3>
-            <div class="summary">
-                <span>Total Paid:</span>
-                <span class="amount">₹130</span>
-            </div>
-            <p>Rate your experience</p>
-            <div id="star-rating">
-                <span class="star" onclick="setRating(1)">★</span>
-                <span class="star" onclick="setRating(2)">★</span>
-                <span class="star" onclick="setRating(3)">★</span>
-                <span class="star" onclick="setRating(4)">★</span>
-                <span class="star" onclick="setRating(5)">★</span>
-            </div>
-            <button class="primary-btn" onclick="location.reload()">Back to Home</button>
-        </section>
+    <!-- Google Fonts & Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+          tailwind.config = {
+            darkMode: "class",
+            theme: {
+              extend: {
+                colors: {
+                  "primary": "#3fff8b",
+                  "primary-container": "#13ea79",
+                  "on-primary": "#005d2c",
+                  "surface": "#0e0e0e",
+                  "on-surface": "#ffffff",
+                  "on-surface-variant": "#adaaaa",
+                  "background": "#0e0e0e",
+                  "outline-variant": "#484847",
+                  "surface-container-highest": "#262626",
+                  "surface-container-low": "#131313",
+                  "surface-container": "#1a1a1a"
+                },
+                fontFamily: {
+                  "headline": ["Manrope"],
+                  "body": ["Inter"],
+                },
+              },
+            },
+          }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0e0e0e; color: #ffffff; margin:0; padding:0; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .kinetic-glass { background: rgba(38, 38, 38, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .map-gradient-overlay { background: linear-gradient(180deg, rgba(14,14,14,0.4) 0%, rgba(14,14,14,0) 20%, rgba(14,14,14,0) 60%, rgba(14,14,14,1) 100%); pointer-events: none; }
         
-        <section id="driver-login-screen" class="screen">
-            <h3>Driver Login</h3>
-            <input type="email" placeholder="Driver Email">
-            <input type="password" placeholder="Password">
-            <button class="primary-btn" onclick="driverLogin()">Login as Driver</button>
-            <button class="secondary-btn" onclick="switchToCustomer()">Switch to Customer</button>
-        </section>
-
-        <section id="driver-home-screen" class="screen">
-            <h3>Driver Dashboard</h3>
-            <button class="primary-btn" onclick="goOnline()">Go Online</button>
-        </section>
-
-        <section id="driver-request-screen" class="screen">
-            <h3>New Ride Request</h3>
-            <div class="request-details">
-                <p><strong>Pickup:</strong> <span id="req-pickup">MG Road</span></p>
-                <p><strong>Drop:</strong> <span id="req-drop">BTM Layout</span></p>
+        .screen { display: none; }
+        .screen.active { display: flex; }
+        
+        /* override leaflet controls to be completely dark mode matching */
+        .leaflet-control-container .leaflet-top.leaflet-left { display: none; } 
+        #map, #driver-map, #driver-nav-map { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index:0; }
+        .leaflet-container { background: #0e0e0e !important; }
+        
+        /* Magical CSS filter to turn OpenStreetMap truly dark theme */
+        .leaflet-tile-pane {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(110%) grayscale(20%);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen overflow-hidden text-white" onload="initMap()">
+    
+    <!-- Top AppBar -->
+    <header class="fixed top-0 w-full z-40 bg-neutral-950/60 backdrop-blur-xl flex justify-between items-center px-6 py-4 shadow-[0_8px_32px_rgba(63,255,139,0.08)] pointer-events-auto border-b border-white/5">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-2xl font-black text-primary italic font-headline">KINETIC</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6 hidden md:flex font-headline font-bold text-neutral-400 text-sm">
+                <a class="text-primary border-b-2 border-primary pb-1 font-black" href="app.html">Dashboard</a>
+                <a class="hover:text-primary transition-colors cursor-pointer" onclick="alert('Activity feature coming soon')">Activity</a>
+                <a class="hover:text-primary transition-colors cursor-pointer text-neutral-500" href="index.html">Logout</a>
             </div>
-            <button class="primary-btn" onclick="acceptRide()">Accept</button>
-            <button class="danger-btn" onclick="rejectRide()">Reject</button>
-        </section>
-
-        <section id="driver-trip-screen" class="screen">
-            <h3>Current Trip</h3>
-            <div id="driver-nav-map" class="map-container"></div>
-            <div class="action-buttons">
-                <button class="primary-btn" onclick="arriveAtPickup()">Arrived at Pickup</button>
-                <button class="primary-btn" onclick="startRide()">Start Trip</button>
-                <button class="danger-btn" onclick="endDriverTrip()">End Trip</button>
+            <div class="w-10 h-10 rounded-full object-cover border-2 border-primary/30 active:scale-95 transition-transform bg-primary/20 flex items-center justify-center cursor-pointer ml-4">
+                <span class="material-symbols-outlined text-primary">person</span>
             </div>
-        </section>
-    </div>
+        </div>
+    </header>
 
+    <!-- Main Content Area -->
+    <main class="relative h-screen w-full pt-16">
+        
+        <!-- Live Map Backgrounds spanning the whole page-->
+        <div class="absolute inset-0 z-0 map-wrapper">
+             <div id="map" class="map-container"></div>
+             <div id="driver-map" class="map-container" style="display:none;"></div>
+             <div id="driver-nav-map" class="map-container" style="display:none;"></div>
+             
+             <!-- Gradient overlay so UI is highly legible -->
+             <div class="map-gradient-overlay absolute inset-0 z-10 pointer-events-none"></div>
+             <div class="absolute inset-0 bg-black/40 z-10 pointer-events-none transition-opacity duration-1000" id="dimmer"></div> 
+        </div>
+
+        <!-- Floating UI Overlays container -->
+        <div class="relative z-20 h-full flex flex-col justify-end p-6 md:p-10 pointer-events-none">
+            
+            <!-- Default Dashboard Screen (location-screen) -->
+            <section id="location-screen" class="screen active flex-col w-full h-full pb-10">
+                <div class="mb-auto mt-10 pointer-events-none">
+                    <h1 class="font-headline font-extrabold text-4xl md:text-5xl text-on-surface leading-tight tracking-tighter drop-shadow-lg">
+                        Good evening,<br/>
+                        <span class="text-primary italic">Rider.</span>
+                    </h1>
+                    <p class="font-body text-on-surface-variant mt-2 max-w-xs text-md font-medium">
+                        Where are we headed tonight? Your premium chauffeur is 4 mins away.
+                    </p>
+                </div>
+                
+                <div class="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 pointer-events-auto">
+                    <!-- Destination Input Card -->
+                    <div class="md:col-span-7 kinetic-glass bg-surface-container-low/80 p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-primary/10 group focus-within:border-primary/40 transition-all">
+                                <span class="material-symbols-outlined text-primary">my_location</span>
+                                <div class="flex flex-col w-full">
+                                    <span class="text-[10px] text-primary uppercase font-black tracking-widest leading-none mb-1">Pick Up</span>
+                                    <input id="pickup" class="bg-transparent border-none p-0 text-white font-headline font-bold focus:ring-0 w-full outline-none" type="text" placeholder="Enter Pickup Location" value="Current Location"/>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 group focus-within:border-primary/40 transition-all">
+                                <span class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors">location_on</span>
+                                <div class="flex flex-col w-full">
+                                    <span class="text-[10px] text-on-surface-variant uppercase font-black tracking-widest leading-none mb-1 group-focus-within:text-primary transition-colors">Destination</span>
+                                    <input id="drop" class="bg-transparent border-none p-0 text-white font-headline font-bold placeholder:text-neutral-600 focus:ring-0 w-full outline-none" placeholder="Where to?" type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Destinations -->
+                    <div class="md:col-span-5 flex flex-col gap-4">
+                        <div class="kinetic-glass bg-surface-container/60 p-5 rounded-3xl flex items-center justify-between group cursor-pointer hover:bg-surface-container-highest transition-all border border-white/10" onclick="document.getElementById('drop').value='248 McKibbin St, Brooklyn'">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary text-2xl">home</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-headline font-bold text-md text-on-surface">Home</h4>
+                                    <p class="text-xs text-neutral-500 font-medium">248 McKibbin St, BK</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kinetic-glass bg-surface-container/60 p-5 rounded-3xl flex items-center justify-between group cursor-pointer hover:bg-surface-container-highest transition-all border border-white/10" onclick="document.getElementById('drop').value='One World Trade Center'">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-cyan-400 text-2xl">work</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-headline font-bold text-md text-on-surface">Office</h4>
+                                    <p class="text-xs text-neutral-500 font-medium">One World Trade Center</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-12 mt-2">
+                        <button onclick="findRides()" class="w-full px-12 py-5 rounded-2xl bg-primary text-black font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_40px_rgba(63,255,139,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                            Find Premium Rides
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Ride Type Selection -->
+            <section id="ride-type-screen" class="screen flex-col justify-end w-full h-full pb-10">
+                <div class="w-full max-w-4xl mx-auto pointer-events-auto">
+                    <h3 class="font-headline text-3xl font-extrabold mb-4 drop-shadow-md">Select your <span class="text-primary italic">Class.</span></h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="rideType" value="Bike" class="hidden peer">
+                            <div class="kinetic-glass bg-surface-container/80 p-6 rounded-3xl border border-white/10 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-headline font-bold text-xl">K-Sprint</span>
+                                    <span class="material-symbols-outlined text-neutral-500 group-hover:text-primary transition-all">two_wheeler</span>
+                                </div>
+                                <p class="text-xs text-neutral-400 mb-4 h-8">Fastest electric two-wheeler</p>
+                                <span class="text-primary font-black text-2xl">₹40</span>
+                            </div>
+                        </label>
+                        
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="rideType" value="Mini" checked class="hidden peer">
+                            <div class="kinetic-glass bg-surface-container/80 p-6 rounded-3xl border border-white/10 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-headline font-bold text-xl">K-Mini</span>
+                                    <span class="material-symbols-outlined text-neutral-500 peer-checked:text-primary group-hover:text-primary transition-all">airport_shuttle</span>
+                                </div>
+                                <p class="text-xs text-neutral-400 mb-4 h-8">Everyday EV comfort for two</p>
+                                <span class="text-primary font-black text-2xl">₹60</span>
+                            </div>
+                        </label>
+                        
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="rideType" value="Sedan" class="hidden peer">
+                            <div class="kinetic-glass bg-surface-container/80 p-6 rounded-3xl border border-white/10 peer-checked:border-primary peer-checked:bg-primary/10 transition-all shadow-xl relative overflow-hidden">
+                                <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-[40px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-headline font-bold text-xl">K-Luxe</span>
+                                    <span class="material-symbols-outlined text-neutral-500 peer-checked:text-primary group-hover:text-primary transition-all">directions_car</span>
+                                </div>
+                                <p class="text-xs text-neutral-400 mb-4 h-8 flex items-center gap-1">Top-tier silent EVs <span class="material-symbols-outlined text-xs text-primary">bolt</span></p>
+                                <span class="text-primary font-black text-2xl">₹80</span>
+                            </div>
+                        </label>
+                        
+                    </div>
+                    <button onclick="confirmBooking()" class="w-full px-12 py-5 rounded-2xl bg-primary text-black font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_40px_rgba(63,255,139,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                        Confirm Booking
+                    </button>
+                    <button onclick="show('location-screen')" class="w-full mt-4 py-3 text-neutral-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-wide">
+                        Back to Map
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Track Driver Screen -->
+            <section id="track-driver-screen" class="screen flex-col justify-end w-full h-full pb-10">
+                <div class="w-full max-w-lg mx-auto pointer-events-auto">
+                    <div class="kinetic-glass bg-surface-container/90 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-neutral-800">
+                            <div class="h-full bg-primary animate-pulse w-full origin-left overflow-hidden"></div>
+                        </div>
+                        <h3 class="font-headline text-2xl font-bold mb-6 text-center">Chauffeur is arriving...</h3>
+                        <div class="flex items-center justify-between mb-8 bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-full bg-neutral-800 border-2 border-primary flex items-center justify-center relative">
+                                    <span class="material-symbols-outlined text-2xl text-primary">person</span>
+                                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-background flex items-center justify-center"><span class="material-symbols-outlined text-[8px] text-black">check</span></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-headline font-bold text-lg leading-tight">Arjun M.</h4>
+                                    <div class="flex items-center gap-2 text-xs text-neutral-400 mt-1">
+                                        <span class="text-yellow-500 font-bold tracking-widest">4.9★</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="bg-primary/10 border border-primary/30 text-primary px-3 py-1 rounded-lg font-mono font-bold tracking-widest text-sm mb-1">KA01AB1234</div>
+                                <div class="text-xs text-neutral-500">Black Tesla Model 3</div>
+                            </div>
+                        </div>
+                        <button onclick="endTrip()" class="w-full py-4 rounded-xl bg-red-500/10 text-red-500 border border-red-500/30 font-headline font-bold text-sm uppercase tracking-widest hover:bg-red-500/20 active:scale-95 transition-all">
+                            End Trip (Demo)
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Rating Screen -->
+            <section id="rating-screen" class="screen flex-col justify-center items-center w-full h-full pb-10">
+                <div class="w-full max-w-sm mx-auto pointer-events-auto text-center kinetic-glass bg-surface-container/90 p-10 rounded-3xl border border-primary/20 shadow-[0_0_50px_rgba(63,255,139,0.1)]">
+                    <span class="material-symbols-outlined text-6xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+                    <h3 class="font-headline text-3xl font-bold mb-2">Trip Completed</h3>
+                    <div class="text-xs text-neutral-500 mb-4 tracking-widest uppercase">Total Fare Paid</div>
+                    <div class="text-5xl font-black text-white mb-8 drop-shadow-lg">₹130</div>
+                    
+                    <p class="text-neutral-400 mb-4 text-sm font-bold uppercase tracking-wider">Rate your experience</p>
+                    <div id="star-rating" class="flex justify-center gap-2 mb-10">
+                        <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(1)">star</span>
+                        <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(2)">star</span>
+                        <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(3)">star</span>
+                        <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(4)">star</span>
+                        <span class="star material-symbols-outlined text-4xl text-neutral-600 cursor-pointer hover:text-yellow-500 hover:scale-110 transition-all" onclick="setRating(5)">star</span>
+                    </div>
+                    
+                    <button onclick="location.href='app.html'" class="w-full px-8 py-5 rounded-2xl bg-primary text-black font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_30px_rgba(63,255,139,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                        Back to Home
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Hidden original elements needed for javascript.js function parity without console errors -->
+            <section id="login-screen" class="screen hidden"></section>
+            <section id="driver-login-screen" class="screen hidden"></section>
+            <section id="driver-home-screen" class="screen hidden"></section>
+            <section id="driver-request-screen" class="screen hidden"></section>
+            <section id="driver-trip-screen" class="screen hidden"></section>
+
+        </div>
+    </main>
+
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- App Logic -->
     <script src="javascript.js"></script>
+    <script>
+        // Ensure default screen is active safely upon load since login-screen is gone
+        setTimeout(() => { show('location-screen'); }, 50);
+
+        // Helper to switch active Leaflet maps natively
+        function toggleMap(showDriver) {
+             document.getElementById('map').style.display = showDriver ? 'none' : 'block';
+             document.getElementById('driver-map').style.display = showDriver ? 'block' : 'none';
+        }
+        
+        // Intercept findRides to add validation gracefully
+        const originalFindRides = window.findRides;
+        window.findRides = function() {
+            if(!document.getElementById('pickup').value || !document.getElementById('drop').value) {
+                alert("Please enter pickup and drop locations");
+                return;
+            }
+            originalFindRides();
+        };
+
+        // Intercept confirmBooking to swap background map instantly
+        const originalConfirmBooking = window.confirmBooking;
+        window.confirmBooking = function() {
+            toggleMap(true); 
+            originalConfirmBooking();
+            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
+        };
+        
+        // Intercept endTrip to dim maps
+        const originalEndTrip = window.endTrip;
+        window.endTrip = function() {
+            document.getElementById('dimmer').style.opacity = '0.8';
+            originalEndTrip();
+        }
+
+        // Intercept setRating to apply material symbol FILL style correctly
+        const originalSetRating = window.setRating;
+        window.setRating = function(n) {
+            document.querySelectorAll('.star').forEach((s, i) => {
+                s.style.color = i < n ? '#f59e0b' : '#52525b';
+                s.style.fontVariationSettings = i < n ? "'FILL' 1" : "'FILL' 0";
+            });
+        }
+    </script>
 </body>
 </html>
