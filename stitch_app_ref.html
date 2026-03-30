@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KINETIC - Premium Ride-Sharing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#74fbbb",
+              "inverse-on-surface": "#565555",
+              "tertiary-fixed-dim": "#00cdec",
+              "on-secondary": "#005e3d",
+              "inverse-surface": "#fcf9f8",
+              "tertiary": "#7ae6ff",
+              "surface-container-high": "#20201f",
+              "on-background": "#ffffff",
+              "surface-dim": "#0e0e0e",
+              "tertiary-container": "#00dcfd",
+              "on-surface-variant": "#adaaaa",
+              "primary-dim": "#24f07e",
+              "surface-container-highest": "#262626",
+              "secondary": "#74fbbb",
+              "on-primary-container": "#004f24",
+              "on-secondary-fixed-variant": "#006945",
+              "on-tertiary-fixed": "#00343d",
+              "outline": "#767575",
+              "primary-fixed": "#3fff8b",
+              "primary-container": "#13ea79",
+              "surface-variant": "#262626",
+              "on-surface": "#ffffff",
+              "surface-container": "#1a1a1a",
+              "surface-container-low": "#131313",
+              "on-primary-fixed-variant": "#006832",
+              "background": "#0e0e0e",
+              "tertiary-fixed": "#00dcfd",
+              "surface-tint": "#3fff8b",
+              "surface-container-lowest": "#000000",
+              "secondary-container": "#006c47",
+              "on-error": "#490006",
+              "error-container": "#9f0519",
+              "primary": "#3fff8b",
+              "secondary-dim": "#65ecae",
+              "on-primary": "#005d2c",
+              "error-dim": "#d7383b",
+              "on-tertiary-container": "#004955",
+              "on-tertiary": "#005360",
+              "surface-bright": "#2c2c2c",
+              "tertiary-dim": "#00cdec",
+              "inverse-primary": "#006e35",
+              "secondary-fixed-dim": "#65ecae",
+              "surface": "#0e0e0e",
+              "error": "#ff716c",
+              "outline-variant": "#484847",
+              "primary-fixed-dim": "#24f07e",
+              "on-tertiary-fixed-variant": "#005361",
+              "on-secondary-fixed": "#00492f",
+              "on-error-container": "#ffa8a3",
+              "on-secondary-container": "#e1ffeb",
+              "on-primary-fixed": "#004820"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0e0e0e; color: #ffffff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .kinetic-glass { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .map-gradient-overlay { background: linear-gradient(180deg, rgba(14,14,14,0.4) 0%, rgba(14,14,14,0) 20%, rgba(14,14,14,0) 80%, rgba(14,14,14,1) 100%); }
+    </style>
+</head>
+<body class="bg-background min-h-screen overflow-hidden">
+<!-- Global Side Navigation (Shared Component) -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-neutral-900 border-r border-neutral-800/15 flex flex-col py-6 gap-2 z-50 hidden md:flex">
+<div class="px-6 mb-10">
+<span class="text-xl font-black text-emerald-400 font-headline uppercase tracking-tighter italic">KINETIC</span>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+<!-- Active State: Home -->
+<a class="flex items-center gap-3 bg-emerald-500/10 text-emerald-400 rounded-lg px-4 py-3 mx-2 font-manrope text-sm font-semibold active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">history</span>
+<span>Activity</span>
+</a>
+<a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span>Wallet</span>
+</a>
+<a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span>Messages</span>
+</a>
+<a class="flex items-center gap-3 text-neutral-500 px-4 py-3 mx-2 font-manrope text-sm font-semibold hover:bg-neutral-800 hover:text-neutral-200 transition-all active:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto px-4 py-6 border-t border-neutral-800/20">
+<div class="flex items-center gap-3 mb-6">
+<img alt="John Doe" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20" data-alt="Close-up portrait of a professional man with a friendly expression, studio lighting, high-end editorial style on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDi1c6czOTCmT7Alfz0gecTMcI-0yhIGpghXKMNpuH0Jf9JS75WRsI6zfAxgM2jB19R3ljJsL0Kz7rWjM21CU5BJIEwXZEKh2ukb0vn3qcINSe9-g2DRLSP9dOA2XrV96juEFtdmjdhjqaFBJcHeCZFu1jmQSYbJZpEXkN6TCw3tO_FI-Ezu7xKXbGbIHc6LJn54dqb0agtmoa3J5UsfNkGHm3xmbNiGIFQaOuf3sLzb2P93gJmmmgzcsB_KveNvJCKDq7fp4w4m6M"/>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-sm text-on-surface">Premium Rider</span>
+<span class="font-body text-xs text-on-surface-variant">Gold Member</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-headline font-bold text-sm hover:brightness-110 active:scale-[0.98] transition-all uppercase tracking-wider">
+                Book Now
+            </button>
+</div>
+</nav>
+<!-- Top AppBar (Mobile/Desktop Hybrid) -->
+<header class="fixed top-0 w-full z-40 bg-neutral-950/60 backdrop-blur-xl flex justify-between items-center px-6 md:px-8 py-4 md:pl-72 shadow-[0_8px_32px_rgba(63,255,139,0.08)]">
+<div class="flex items-center gap-4">
+<div class="md:hidden">
+<span class="text-2xl font-black text-emerald-400 italic font-headline">KINETIC</span>
+</div>
+<div class="hidden md:flex items-center gap-6 font-manrope font-bold tracking-tight text-neutral-400">
+<a class="text-emerald-400 border-b-2 border-emerald-400 pb-1" href="#">Rides</a>
+<a class="hover:text-emerald-300 transition-colors duration-300" href="#">Safety</a>
+<a class="hover:text-emerald-300 transition-colors duration-300" href="#">Support</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end mr-2 md:mr-0">
+<span class="font-headline font-bold text-sm text-on-surface">John Doe</span>
+<span class="font-body text-[10px] text-primary uppercase tracking-widest font-bold">Priority Status</span>
+</div>
+<div class="relative">
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-primary/30 active:scale-95 transition-transform cursor-pointer" data-alt="Professional profile photo of a man, dark background, cinematic lighting, sharp focus on eyes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq6IXMnt8RJWJl_SypXnE-fX-eX0FfMMHvOYlKtRIM6jM6CJX38ZtPlAv_9bT1lESaxe_2BVDLZ3zlC9gwXQHewiz3on_l9cG37A2yEt7eknyKy0JyZXYuwDaSIeYodGtCW8PJc86hFFr0jOC5mYXRPTX-olV7sojcv8T7-qJk5-6Iy6wAfz2LE15c6BFra4TA3B8eJ2eE2o35lDLHQFZv4_68Tv4FymBKdARYCYece_7HbMB-Eg6dc_J4RcazlbDzl7JspK8sm9E"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-primary border-2 border-background rounded-full"></div>
+</div>
+</div>
+</header>
+<!-- Main Map Canvas -->
+<main class="relative h-screen w-full md:pl-64 pt-16">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-surface-dim relative">
+<img alt="Dark themed map" class="w-full h-full object-cover opacity-60 grayscale brightness-50" data-alt="Detailed dark-themed urban map with glowing neon green routes and pulsing destination markers, high-contrast night aesthetic" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBvTjeMJYTwbo24LlGaN-Ywbn0cG-_mPp7PTmq-BSLbpCBYzH2noLIDrRy8Tp1GqG1FzWZhNI4AuCwsaedBLyWsbClNL4bTTNVdWqlgKUYSQdhNNr0um7dlaXKPBLi7jtP2n6SxtB3bgzj85sC5-7abj1oBaRri_NfDQe9IoS0GkvBtbshSwc2pzg-8S92odY_rOVoO5hJascDBLldDIDak0xvgUU8u2wDFgaUZX6dBtwTAlKE2y728-vOIylGv6mFqsFAwSKFCbw"/>
+<div class="map-gradient-overlay absolute inset-0 pointer-events-none"></div>
+<!-- Animated Pulse Marker Example -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+<div class="relative">
+<div class="absolute inset-0 bg-primary/40 rounded-full animate-ping scale-150"></div>
+<div class="relative w-6 h-6 bg-primary rounded-full shadow-[0_0_20px_rgba(63,255,139,0.8)] border-2 border-on-surface flex items-center justify-center">
+<span class="w-2 h-2 bg-on-primary rounded-full"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Overlays -->
+<div class="relative z-20 h-full flex flex-col justify-end p-6 md:p-10 pointer-events-none">
+<!-- Greeting & Personal Context -->
+<div class="mb-auto mt-10 md:mt-20 pointer-events-auto">
+<h1 class="font-headline font-extrabold text-4xl md:text-6xl text-on-surface leading-tight tracking-tighter">
+                    Good evening,<br/>
+<span class="text-primary italic">John.</span>
+</h1>
+<p class="font-body text-on-surface-variant mt-4 max-w-xs text-lg">
+                    Where are we headed tonight? Your premium chauffeur is 4 mins away.
+                </p>
+</div>
+<!-- Bento Ride Booking Module -->
+<div class="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 pointer-events-auto">
+<!-- Destination Input Card -->
+<div class="md:col-span-7 kinetic-glass bg-surface-container-low/80 p-6 rounded-2xl shadow-2xl border border-white/5">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-primary/10 group focus-within:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-primary">my_location</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Pick Up</span>
+<input class="bg-transparent border-none p-0 text-on-surface font-headline font-bold focus:ring-0 w-full" type="text" value="The Standard, High Line"/>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border border-white/5 group focus-within:border-primary/40 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary">location_on</span>
+<div class="flex flex-col flex-grow">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Destination</span>
+<input class="bg-transparent border-none p-0 text-on-surface font-headline font-bold placeholder:text-neutral-600 focus:ring-0 w-full" placeholder="Where to?" type="text"/>
+</div>
+<span class="material-symbols-outlined text-neutral-600">add_circle</span>
+</div>
+</div>
+</div>
+<!-- Recent/Favorite Destinations -->
+<div class="md:col-span-5 flex flex-col gap-4">
+<div class="kinetic-glass bg-surface-container/60 p-4 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-surface-container-highest transition-all border border-white/5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">home</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface">Home</h4>
+<p class="text-[11px] text-on-surface-variant font-body">248 McKibbin St, Brooklyn</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<div class="kinetic-glass bg-surface-container/60 p-4 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-surface-container-highest transition-all border border-white/5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">work</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface">Kinetic Labs HQ</h4>
+<p class="text-[11px] text-on-surface-variant font-body">One World Trade Center</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="md:col-span-12 flex flex-wrap items-center justify-between gap-4 mt-2">
+<div class="flex gap-3">
+<button class="px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-headline font-bold text-xs flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">electric_car</span>
+                            KINETIC LUX
+                        </button>
+<button class="px-6 py-3 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-bold text-xs flex items-center gap-2 hover:bg-surface-variant transition-all">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                            Schedule
+                        </button>
+</div>
+<button class="flex-grow md:flex-none px-12 py-4 rounded-xl bg-primary text-on-primary font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_40px_rgba(63,255,139,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                        Request Pulse Ride
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 kinetic-glass bg-neutral-950/80 px-6 py-4 flex justify-between items-center shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center gap-1 text-emerald-400" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-neutral-500" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold">Activity</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-neutral-500" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[10px] font-bold">Wallet</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-neutral-500" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="text-[10px] font-bold">Inbox</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-neutral-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold">Account</span>
+</a>
+</nav>
+</body></html>

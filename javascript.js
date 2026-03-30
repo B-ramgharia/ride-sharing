@@ -81,11 +81,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+const indiaBounds = L.latLngBounds([6.4627, 68.1097], [35.5133, 97.3954]);
+
 function initMap() {
     if (mapInstance) {
         mapInstance.remove();
     }
-    mapInstance = L.map('map').setView([20.5937, 78.9629], 5);
+    mapInstance = L.map('map', {
+        maxBounds: indiaBounds,
+        maxBoundsViscosity: 1.0,
+        minZoom: 5
+    }).setView([20.5937, 78.9629], 5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mapInstance);
@@ -97,7 +103,11 @@ function initMap() {
 }
 
 function initDriverMap() {
-    let dMap = L.map('driver-map').setView([12.9716, 77.5946], 13);
+    let dMap = L.map('driver-map', {
+        maxBounds: indiaBounds,
+        maxBoundsViscosity: 1.0,
+        minZoom: 5
+    }).setView([12.9716, 77.5946], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(dMap);
@@ -111,7 +121,11 @@ function initDriverMap() {
 }
 
 function initDriverNavMap() {
-    let nMap = L.map('driver-nav-map').setView([12.9716, 77.5946], 13);
+    let nMap = L.map('driver-nav-map', {
+        maxBounds: indiaBounds,
+        maxBoundsViscosity: 1.0,
+        minZoom: 5
+    }).setView([12.9716, 77.5946], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(nMap);

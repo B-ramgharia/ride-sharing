@@ -443,7 +443,7 @@
                 // Geocode Pickup if it's not the auto-locating one or if userLat is missing
                 let pLat = window.userLat; let pLon = window.userLon;
                 if(!pLat || pickupValue !== window.lastAutoAddress) {
-                    const pickRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickupValue)}&format=json&limit=1`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
+                    const pickRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickupValue)}&format=json&limit=1&countrycodes=in`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
                     const pickData = await pickRes.json();
                     if(pickData && pickData.length > 0) {
                         pLat = parseFloat(pickData[0].lat); pLon = parseFloat(pickData[0].lon);
@@ -451,7 +451,7 @@
                 }
                 if(!pLat) { pLat = 28.6139; pLon = 77.2090; } // Fallback to Delhi
 
-                const dropRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropValue)}&format=json&limit=1`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
+                const dropRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropValue)}&format=json&limit=1&countrycodes=in`, {headers:{"User-Agent": "KineticRideApp/1.0"}});
                 const dropData = await dropRes.json();
                 
                 if(dropData && dropData.length > 0) {
@@ -681,10 +681,10 @@ async function showActivity() {
             list.innerHTML = `<div class="p-4 text-center text-sm text-neutral-400"><span class="material-symbols-outlined animate-spin text-sm" style="display:inline-block; vertical-align:middle; margin-right:8px;">refresh</span>${isNearby ? 'Finding nearby places...' : 'Searching...'}</div>`;
             list.classList.remove('hidden');
             
-            let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1`;
+            let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1&countrycodes=in`;
             if(isNearby && window.userLat) {
                 // If it's a 'nearby' tap, search for common POIs near the user
-                url = `https://nominatim.openstreetmap.org/search?q=hospital+mall+station&format=json&limit=8&lat=${window.userLat}&lon=${window.userLon}&bounded=1&viewbox=${window.userLon-0.02},${window.userLat+0.02},${window.userLon+0.02},${window.userLat-0.02}`;
+                url = `https://nominatim.openstreetmap.org/search?q=hospital+mall+station&format=json&limit=8&lat=${window.userLat}&lon=${window.userLon}&bounded=1&countrycodes=in&viewbox=${window.userLon-0.02},${window.userLat+0.02},${window.userLon+0.02},${window.userLat-0.02}`;
             }
 
             try {

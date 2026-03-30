@@ -67,12 +67,12 @@
                     <p class="text-neutral-400">Welcome back! Access your rides.</p>
                 </div>
 
-                <form method="GET" action="app.html" class="space-y-6 relative z-10">
+                <form id="login-form" class="space-y-6 relative z-10">
                     <div>
                         <label class="block text-sm font-medium mb-2 text-neutral-400">Email Address</label>
                         <div class="relative">
                             <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500"></i>
-                            <input type="email" name="email" required
+                            <input type="email" id="login-email" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:border-primary outline-none transition-all text-white placeholder-neutral-600"
                                 placeholder="you@example.com">
                         </div>
@@ -82,7 +82,7 @@
                         <label class="block text-sm font-medium mb-2 text-neutral-400">Password</label>
                         <div class="relative">
                             <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500"></i>
-                            <input type="password" name="password" required
+                            <input type="password" id="login-password" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:border-primary outline-none transition-all text-white placeholder-neutral-600"
                                 placeholder="••••••••">
                         </div>
@@ -93,6 +93,7 @@
                         <span>Sign In</span>
                         <i data-lucide="chevron-right" class="w-5 h-5"></i>
                     </button>
+                    <p id="error-msg" class="text-error text-xs text-center hidden"></p>
                 </form>
 
                 <div class="mt-8 text-center relative z-10">
@@ -104,9 +105,38 @@
         </div>
     </main>
 
-    <!-- Lucide Init -->
+    <!-- Login Logic -->
     <script>
         lucide.createIcons();
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('error-msg');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('user_name', data.user.username);
+                    localStorage.setItem('user_email', data.user.email);
+                    localStorage.setItem('auth_token', data.token);
+                    window.location.href = 'app.html';
+                } else {
+                    errorEl.innerText = data.error || 'Login failed';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                errorEl.innerText = 'Connection error. Is the server running?';
+                errorEl.classList.remove('hidden');
+            }
+        });
     </script>
 </body>
 </html>
